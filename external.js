@@ -10,10 +10,14 @@ function External(context){
 
   var additionalParams = getAdditional(node)
   var externalParams = null
+
   var release = null
+  var releaseCC = null
 
   var lastDescriptor = null
   node.inner = null
+
+  node.controllerContext = Observ()
 
   node.destroy = function(){
     if (node.inner && node.inner.destroy){
@@ -59,6 +63,12 @@ function External(context){
 
       if (node.inner && node.inner.destroy){
         node.inner.destroy()
+
+        if (releaseCC){
+          releaseCC()
+          releaseCC = null
+          node.controllerContext.set(null)
+        }
       }
 
       node.inner = null
@@ -66,6 +76,10 @@ function External(context){
       if (descriptor && ctor){
         node.inner = ctor(context)
         node.inner.set(descriptor)
+
+        if (node.inner.controllerContext){
+          releaseCC = watch(node.inner.controllerContext, node.controllerContext.set)
+        }
       }
     }
 

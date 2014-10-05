@@ -1,4 +1,5 @@
 var Observ = require('observ')
+var watch = require('observ/watch')
 
 module.exports = ObservNodeArray
 
@@ -7,6 +8,10 @@ function ObservNodeArray(context){
   obs._list = []
 
   var instanceDescriptors = []
+
+  obs.controllerContextLookup = Observ({})
+
+  var removeListeners = []
 
   obs(function(descriptors){
     if (!Array.isArray(descriptors)){
@@ -27,6 +32,11 @@ function ObservNodeArray(context){
       } else {
         if (instance && instance.destroy){
           instance.destroy()
+
+          if (removeListeners[i]){
+            removeListeners()
+            removeListeners[i] = null
+          }
         }
 
         obs._list[i] = null
@@ -37,14 +47,31 @@ function ObservNodeArray(context){
             instance = ctor(context)
             obs._list[i] = instance
             instance.set(descriptor)
+
+            if (instance.controllerContext){
+              removeListeners[i] = watch(instance.controllerContext, updateCC)
+            }
           }
         }
       }
     }
 
     obs._list.length = descriptors.length
+    removeListeners.length = descriptors.length
     instanceDescriptors = descriptors
   })
 
+  function updateCC(){
+    obs.controllerContextLookup.set(obs._list.reduce(chunkLookup, {}))
+  }
+
   return obs
+}
+
+function chunkLookup(result, item){
+  var data = item.controllerContext()
+  if (data && data.id){
+    result[data.id] = data
+  }
+  return result
 }

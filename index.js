@@ -3,14 +3,19 @@ var ObservNodeArray = require('./node-array.js')
 var Event = require('geval')
 var Observ = require('observ')
 var watch = require('observ/watch')
+var computed = require('observ/computed')
 
 module.exports = Setup
 
 function Setup(context){
+  var controllerContext = Object.create(context)
+
   var node = ObservStruct({
-    controllers: ObservNodeArray(context),
+    controllers: ObservNodeArray(controllerContext),
     chunks: ObservNodeArray(context)
   })
+
+  controllerContext.chunkLookup = node.chunks.controllerContextLookup
 
   var removeListener = null
   var onLoad = null
