@@ -1,0 +1,38 @@
+{
+  "name": "loop-drop-setup",
+  "version": "0.0.0",
+  "description": "Persist Loop Drop controller and chunk setups.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mmckegg/loop-drop-setup.git"
+  },
+  "keywords": [
+    "loop",
+    "drop",
+    "observ",
+    "audio",
+    "waapi",
+    "soundbank",
+    "controller",
+    "persist"
+  ],
+  "author": "Matt McKegg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mmckegg/loop-drop-setup/issues"
+  },
+  "homepage": "https://github.com/mmckegg/loop-drop-setup",
+  "dependencies": {
+    "geval": "^2.1.1",
+    "observ": "^0.2.0",
+    "observ-struct": "^5.0.1",
+    "xtend": "^4.0.0"
+  },
+  "devDependencies": {
+    "tape": "^3.0.0"
+  }
+}
