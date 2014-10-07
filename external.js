@@ -25,9 +25,12 @@ function External(context){
       node.inner = null
     }
 
-    release()
-    release = null
-    externalParams = null
+    if (release){
+      release()
+      release = null
+      externalParams = null
+    }
+
   }
 
   watch(node, function(descriptor){
