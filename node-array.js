@@ -34,7 +34,7 @@ function ObservNodeArray(context){
           instance.destroy()
 
           if (removeListeners[i]){
-            removeListeners()
+            removeListeners[i]()
             removeListeners[i] = null
           }
         }
