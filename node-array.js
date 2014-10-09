@@ -10,6 +10,7 @@ function ObservNodeArray(context){
   var instanceDescriptors = []
 
   obs.controllerContextLookup = Observ({})
+  obs.map = obs._list.map.bind(obs._list)
 
   var removeListeners = []
 
