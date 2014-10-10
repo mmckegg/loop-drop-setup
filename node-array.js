@@ -12,6 +12,19 @@ function ObservNodeArray(context){
   obs.controllerContextLookup = Observ({})
   obs.map = obs._list.map.bind(obs._list)
 
+  obs.push = function(descriptor){
+    var ctor = descriptor && context.nodes[descriptor.node]
+    if (ctor){
+      instance = ctor(context)
+      obs._list.push(instance) 
+      instance.set(descriptor)
+      instanceDescriptors.push(descriptor)
+      if (instance.controllerContext){
+        removeListeners.push(watch(instance.controllerContext, updateCC))
+      }
+    }
+  }
+
   var removeListeners = []
 
   obs(function(descriptors){
