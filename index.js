@@ -78,6 +78,7 @@ function Setup(context){
     if (node.file){
       node.file.close()
       node.file = null
+      node.set({})
     }
     release()
   }
