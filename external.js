@@ -47,7 +47,7 @@ function External(context){
             release&&release()
             externalParams = observJson(context.project.getFile(descriptor.src))
             externalParams.src = descriptor.src
-            release = externalParams(update)
+            release = watch(externalParams, update)
           }
         })
       }
