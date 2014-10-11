@@ -2,6 +2,8 @@ var Observ = require('observ')
 var extend = require('xtend')
 var computed = require('observ/computed')
 var watch = require('observ/watch')
+var Event = require('geval')
+var nextTick = require('next-tick')
 
 module.exports = External
 
@@ -16,8 +18,8 @@ function External(context){
 
   var lastDescriptor = null
   node.inner = null
-
   node.controllerContext = Observ()
+  node.resolved = Observ()
 
   node.destroy = function(){
     if (node.inner && node.inner.destroy){
@@ -60,8 +62,10 @@ function External(context){
     var descriptor = extend(externalParams(), additionalParams())
     var ctor = descriptor && context.nodes[descriptor.node]
 
+
     if (descriptor && node && lastDescriptor && descriptor.node == lastDescriptor.node){
       node.inner.set(descriptor)
+      node.resolved.set(descriptor)
     } else {
 
       if (node.inner && node.inner.destroy){
@@ -71,6 +75,7 @@ function External(context){
           releaseCC()
           releaseCC = null
           node.controllerContext.set(null)
+          node.resolved.set(null)
         }
       }
 
@@ -83,6 +88,8 @@ function External(context){
         if (node.inner.controllerContext){
           releaseCC = watch(node.inner.controllerContext, node.controllerContext.set)
         }
+
+        node.resolved.set(descriptor)
       }
     }
 

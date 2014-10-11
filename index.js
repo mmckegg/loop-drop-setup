@@ -15,7 +15,13 @@ function Setup(context){
 
   var node = ObservStruct({
     controllers: ObservNodeArray(controllerContext),
-    chunks: ObservNodeArray(context)
+    chunks: ObservNodeArray(context),
+    selectedChunkId: Observ()
+  })
+
+  node.resolved = ObservStruct({
+    controllers: node.controllers.resolved,
+    chunks: node.chunks.resolved
   })
 
   controllerContext.chunkLookup = node.chunks.controllerContextLookup

@@ -12,6 +12,16 @@ function ObservNodeArray(context){
   obs.controllerContextLookup = Observ({})
   obs.map = obs._list.map.bind(obs._list)
 
+  obs.getLength = function(){
+    return obs._list.length
+  }
+
+  obs.get = function(i){
+    return obs._list[i]
+  }
+
+  obs.resolved = Observ([])
+
   obs.push = function(descriptor){
     var ctor = descriptor && context.nodes[descriptor.node]
     if (ctor){
@@ -21,6 +31,9 @@ function ObservNodeArray(context){
       instanceDescriptors.push(descriptor)
       if (instance.controllerContext){
         removeListeners.push(watch(instance.controllerContext, updateCC))
+      }
+      if (instance.resolved){
+        instance.resolved(updateResolved)
       }
     }
   }
@@ -60,8 +73,13 @@ function ObservNodeArray(context){
           if (ctor){
             instance = ctor(context)
             obs._list[i] = instance
-            instance.set(descriptor)
+            
+            if (instance.resolved){
+              instance.resolved(updateResolved)
+            }
 
+            instance.set(descriptor)
+            
             if (instance.controllerContext){
               removeListeners[i] = watch(instance.controllerContext, updateCC)
             }
@@ -79,7 +97,22 @@ function ObservNodeArray(context){
     obs.controllerContextLookup.set(obs._list.reduce(chunkLookup, {}))
   }
 
+  function updateResolved(){
+    obs.resolved.set(obs._list.map(resolve))
+  }
+
+  updateResolved()
   return obs
+}
+
+function resolve(node){
+  if (node){
+    if (node.resolved){
+      return node.resolved()
+    } else {
+      return node()
+    }
+  }
 }
 
 function chunkLookup(result, item){
