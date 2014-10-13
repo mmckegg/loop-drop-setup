@@ -8,6 +8,8 @@ var getDirName = require('path').dirname
 var getBaseName = require('path').basename
 var join = require('path').join
 
+var NO_TRANSACTION = {}
+
 module.exports = Setup
 
 function Setup(context){
@@ -28,6 +30,8 @@ function Setup(context){
 
   var removeListener = null
   var removeCloseListener = null
+  var currentTransaction = NO_TRANSACTION
+  var lastSavedValue = NO_TRANSACTION
 
   var onLoad = null
   var onClose = null
@@ -39,6 +43,13 @@ function Setup(context){
   })
 
   node.file = null
+
+  node(function(newValue){
+    if (newValue && newValue !== currentTransaction && node.file){
+      lastSavedValue = JSON.stringify(newValue)
+      node.file.set(lastSavedValue)
+    }
+  })
 
   function release(){
     if (removeListener){
@@ -90,14 +101,14 @@ function Setup(context){
   }
 
   function update(data){
-    var obj = {}
-    
-    try {
-      obj = JSON.parse(data || '{}') || {}
-    } catch (ex) {}
-
-    obj._path = node.path
-    node.set(obj || {})
+    if (data && data !== lastSavedValue){
+      try {
+        var obj = JSON.parse(data || '{}') || {}
+        currentTransaction = obj || {}
+        node.set(currentTransaction)
+        currentTransaction = NO_TRANSACTION
+      } catch (ex) {}
+    }
   }
 
   return node

@@ -63,7 +63,7 @@ function External(context){
     var ctor = descriptor && context.nodes[descriptor.node]
 
 
-    if (descriptor && node && lastDescriptor && descriptor.node == lastDescriptor.node){
+    if (node.inner && descriptor && node && lastDescriptor && descriptor.node == lastDescriptor.node){
       node.inner.set(descriptor)
       node.resolved.set(descriptor)
     } else {
