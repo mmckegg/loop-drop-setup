@@ -21,6 +21,18 @@ function Setup(context){
     selectedChunkId: Observ()
   })
 
+  node.selectedTriggerId = computed([node.selectedChunkId, node.chunks.controllerContextLookup], function(selectedChunkId, chunkLookup){
+    var selectedChunk = chunkLookup[selectedChunkId]
+    if (selectedChunk){
+      var selectedSlotId = selectedChunk.selectedSlotId
+      return selectedSlotId ? selectedChunkId + '#' + selectedSlotId : null
+    } else {
+      return null
+    }
+  })
+
+
+
   node.resolved = ObservStruct({
     controllers: node.controllers.resolved,
     chunks: node.chunks.resolved
