@@ -44,6 +44,7 @@ function Setup(context){
   var removeCloseListener = null
   var currentTransaction = NO_TRANSACTION
   var lastSavedValue = NO_TRANSACTION
+  var loading = false
 
   var onLoad = null
   var onClose = null
@@ -75,6 +76,7 @@ function Setup(context){
   node.load = function(src){
     release()
     if (src){
+      loading = true
       node.file = context.project.getFile(src, onLoad)
       node.path = node.file.path
       removeListener = watch(node.file, update)
@@ -119,7 +121,12 @@ function Setup(context){
         currentTransaction = obj || {}
         node.set(currentTransaction)
         currentTransaction = NO_TRANSACTION
-      } catch (ex) {}
+      } catch (ex) {
+        if (loading === true){
+          node.set(null)
+        }
+      }
+      loading = false
     }
   }
 
