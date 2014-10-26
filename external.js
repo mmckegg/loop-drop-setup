@@ -4,6 +4,7 @@ var computed = require('observ/computed')
 var watch = require('observ/watch')
 var Event = require('geval')
 var nextTick = require('next-tick')
+var resolveNode = require('./resolve-node.js')
 
 module.exports = External
 
@@ -60,7 +61,7 @@ function External(context){
 
   function update(){
     var descriptor = extend(externalParams(), additionalParams())
-    var ctor = descriptor && context.nodes[descriptor.node]
+    var ctor = descriptor && resolveNode(context.nodes, descriptor.node)
 
 
     if (node.inner && descriptor && node && lastDescriptor && descriptor.node == lastDescriptor.node){

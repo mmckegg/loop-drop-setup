@@ -5,13 +5,15 @@ var Observ = require('observ')
 
 test('external', function(t){
 
-  t.plan(4)
+  t.plan(5)
 
   var setupDescriptor = {
     chunks: [
       { node: 'external', src: 'chunk.json', anotherValue: 456 }
     ],
-    controllers: []
+    controllers: [
+      { node: 'controller/sub', value: 525 }
+    ]
   }
 
   var chunkDescriptor = {value: 123, node: 'test'}
@@ -36,12 +38,23 @@ test('external', function(t){
         })
         return node
       },
+      controller: {
+        sub: function SubControllerNode(){
+          var node = Observ()
+          node(function(descriptor){
+            t.deepEqual(descriptor,  { value: 525, node: 'controller/sub' })
+          })
+          return node
+        }
+      },
       external: require('../external.js')
     },
     project: {
       getFile: function(src, cb){
         var obs = Observ()
         obs.path = src
+
+        obs.onClose = function noop(){}
 
         process.nextTick(function(){
           if (src == 'chunk.json'){
@@ -58,6 +71,9 @@ test('external', function(t){
           cb&&cb(null, obs)
         })
         return obs
+      },
+      checkExists: function(src, cb){
+        cb(null, true)
       }
     }
   }
@@ -66,9 +82,8 @@ test('external', function(t){
 
   setup(function(data){
     t.deepEqual(data, { 
-      _path: 'setup.json', 
       chunks: [ { anotherValue: 456, node: 'external', src: 'chunk.json' } ], 
-      controllers: [] 
+      controllers: [ { node: 'controller/sub', value: 525 } ] 
     }, 'initital setup')
   })
 

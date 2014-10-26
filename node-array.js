@@ -1,5 +1,6 @@
 var Observ = require('observ')
 var watch = require('observ/watch')
+var resolveNode = require('./resolve-node.js')
 
 var NO_TRANSACTION = {}
 
@@ -71,7 +72,7 @@ function ObservNodeArray(context){
   obs.resolved = Observ([])
 
   obs.push = function(descriptor){
-    var ctor = descriptor && context.nodes[descriptor.node]
+    var ctor = descriptor && resolveNode(context.nodes, descriptor.node)
     if (ctor){
       instance = ctor(context)
 
@@ -113,7 +114,7 @@ function ObservNodeArray(context){
       var descriptor = descriptors[i]
       var lastDescriptor = instanceDescriptors[i]
 
-      var ctor = descriptor && context.nodes[descriptor.node]
+      var ctor = descriptor && resolveNode(context.nodes, descriptor.node)
 
       if (instance && descriptor && lastDescriptor && descriptor.node == lastDescriptor.node){
         instance.set(descriptor)
@@ -196,7 +197,7 @@ function resolve(node){
 }
 
 function chunkLookup(result, item){
-  if (item.controllerContext){
+  if (item && item.controllerContext){
     var data = item.controllerContext()
     if (data && data.id){
       result[data.id] = data
