@@ -74,28 +74,31 @@ function ObservNodeArray(context){
   obs.push = function(descriptor){
     var ctor = descriptor && resolveNode(context.nodes, descriptor.node)
     if (ctor){
-      instance = ctor(context)
-
-      if (instance.resolved){
-        instance.resolved(updateResolved)
-      }
-      
-      obs._list.push(instance) 
-      instance.set(descriptor)
-      instanceDescriptors.push(descriptor)
-
-      removeListeners.push(instance(update))
-
-      if (instance.controllerContext){
-        removeCCListeners.push(instance.controllerContext(updateCC))
-      }
-
+      var instance = createInstanceAt(ctor, descriptor, obs._list.length)
       update()
     }
   }
 
+  var removeNodeListeners = []
   var removeCCListeners = []
   var removeListeners = []
+
+  function removeListenerFor(i){
+    if (removeCCListeners[i]){
+      removeCCListeners[i]()
+      removeCCListeners[i] = null
+    }
+
+    if (removeListeners[i]){
+      removeListeners[i]()
+      removeListeners[i] = null
+    }
+
+    if (removeNodeListeners[i]){
+      removeNodeListeners[i]()
+      removeNodeListeners[i] = null
+    }
+  }
 
   obs(function(descriptors){
 
@@ -121,16 +124,7 @@ function ObservNodeArray(context){
       } else {
         if (instance && instance.destroy){
           instance.destroy()
-
-          if (removeCCListeners[i]){
-            removeCCListeners[i]()
-            removeCCListeners[i] = null
-          }
-
-          if (removeListeners[i]){
-            removeListeners[i]()
-            removeListeners[i] = null
-          }
+          removeListenerFor(i)
         }
 
         obs._list[i] = null
@@ -138,19 +132,7 @@ function ObservNodeArray(context){
         if (descriptor){
           // create
           if (ctor){
-            instance = ctor(context)
-            obs._list[i] = instance
-            
-            if (instance.resolved){
-              instance.resolved(updateResolved)
-            }
-
-            instance.set(descriptor)
-            removeListeners[i] = instance(update)
-
-            if (instance.controllerContext){
-              removeCCListeners[i] = watch(instance.controllerContext, updateCC)
-            }
+            instance = createInstanceAt(ctor, descriptor, i)
           }
         }
       }
@@ -161,6 +143,27 @@ function ObservNodeArray(context){
     removeCCListeners.length = descriptors.length
     instanceDescriptors = descriptors
   })
+
+  function createInstanceAt(ctor, descriptor, index){
+    var instance = ctor(context)
+    obs._list[index] = instance
+    
+    if (instance.resolved){
+      instance.resolved(updateResolved)
+    }
+
+    instance.set(descriptor)
+    removeListeners[index] = instance(update)
+
+    if (instance.node){
+      removeNodeListeners[index] = instance.node(updateNode.bind(instance))
+    }
+
+    if (instance.controllerContext){
+      removeCCListeners[index] = watch(instance.controllerContext, updateCC)
+    }
+    return instance
+  }
 
   function update(){
     currentTransaction = obs._list.map(getValue)
@@ -176,6 +179,16 @@ function ObservNodeArray(context){
 
   function updateResolved(){
     obs.resolved.set(obs._list.map(resolve))
+  }
+
+  function updateNode(newNode){
+    var instance = this
+    var index = obs._list.indexOf(instance)
+    if (~index){
+      var ctor = resolveNode(context.nodes, newNode)
+      removeListenerFor(index)
+      createInstanceAt(ctor, instance(), index)
+    }
   }
 
   updateResolved()
