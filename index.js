@@ -59,8 +59,10 @@ function Setup(context){
 
   node(function(newValue){
     if (newValue && newValue !== currentTransaction && node.file){
-      lastSavedValue = JSON.stringify(newValue)
-      node.file.set(lastSavedValue)
+      if (Object.keys(newValue).length > 0){
+        lastSavedValue = JSON.stringify(newValue)
+        node.file.set(lastSavedValue)
+      }
     }
   })
 
@@ -126,8 +128,8 @@ function Setup(context){
           node.set(null)
         }
       }
-      loading = false
     }
+    loading = false
   }
 
   return node
