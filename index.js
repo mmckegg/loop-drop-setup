@@ -55,6 +55,10 @@ function Setup(context){
     onClose = broadcast
   })
 
+  node.onRequestEditChunk = Event(function(broadcast){
+    node.requestEditChunk = broadcast
+  })
+
   node.file = null
 
   node(function(newValue){
@@ -103,6 +107,28 @@ function Setup(context){
         node.path = node.file.path
         removeListener = watch(node.file, update)
         removeCloseListener = node.file.onClose(onClose)
+      }
+    }
+  }
+
+  node.grabInput = function(){
+    var length = node.controllers.getLength()
+    for (var i=0;i<length;i++){
+      var controller = node.controllers.get(i)
+      if (controller.grabInput){
+        controller.grabInput()
+      }
+    }
+
+    // now focus the selected chunk
+    if (node.selectedChunkId){
+      var chunkId = node.selectedChunkId()
+      for (var i=0;i<length;i++){
+        var controller = node.controllers.get(i)
+        var chunkPositions = controller().chunkPositions || {}
+        if (controller.grabInput && chunkPositions[chunkId]){
+          controller.grabInput()
+        }
       }
     }
   }
