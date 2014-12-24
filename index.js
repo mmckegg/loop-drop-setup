@@ -59,6 +59,24 @@ function Setup(context){
     node.requestEditChunk = broadcast
   })
 
+  node.onRequestCreateChunk = Event(function(broadcast){
+    node.requestCreateChunk = broadcast
+  })
+
+  node.getNewChunkId = function(src){
+    var lookup = node.chunks.controllerContextLookup()
+    var base = getBaseName(src, '.json')
+    var incr = 0
+    var id = base
+
+    while (lookup[id]){
+      incr += 1
+      id = base + ' ' + (incr + 1)
+    }
+
+    return id
+  }
+
   node.file = null
 
   node(function(newValue){
