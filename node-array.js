@@ -52,6 +52,7 @@ function ObservNodeArray(context){
     if (~currentIndex){
       remove(currentIndex)
       update()
+      item.destroy && item.destroy()
     }
   }
 
