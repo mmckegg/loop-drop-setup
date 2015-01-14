@@ -56,20 +56,6 @@ function Setup(parentContext){
     chunks: node.chunks.resolved
   })
 
-  node.getNewChunkId = function(src){
-    var lookup = node.chunks.controllerContextLookup()
-    var base = getBaseName(src, '.json')
-    var incr = 0
-    var id = base
-
-    while (lookup[id]){
-      incr += 1
-      id = base + ' ' + (incr + 1)
-    }
-
-    return id
-  }
-
   node.grabInput = function(){
     var length = node.controllers.getLength()
     for (var i=0;i<length;i++){
