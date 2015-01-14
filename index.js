@@ -51,18 +51,9 @@ function Setup(parentContext){
 
   node.context = context
 
-
   node.resolved = ObservStruct({
     controllers: node.controllers.resolved,
     chunks: node.chunks.resolved
-  })
-
-  node.onRequestEditChunk = Event(function(broadcast){
-    node.requestEditChunk = broadcast
-  })
-
-  node.onRequestCreateChunk = Event(function(broadcast){
-    node.requestCreateChunk = broadcast
   })
 
   node.getNewChunkId = function(src){
