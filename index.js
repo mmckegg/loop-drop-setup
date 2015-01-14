@@ -1,5 +1,5 @@
 var ObservStruct = require('observ-struct')
-var ObservNodeArray = require('./node-array.js')
+var NodeArray = require('observ-node-array')
 var Event = require('geval')
 var Observ = require('observ')
 var watch = require('observ/watch')
@@ -7,52 +7,54 @@ var computed = require('observ/computed')
 var getDirName = require('path').dirname
 var getBaseName = require('path').basename
 var join = require('path').join
+var relative = require('path').relative
 
-var NO_TRANSACTION = {}
+var map = require('observ-node-array/map')
+var lookup = require('observ-node-array/lookup')
 
 module.exports = Setup
 
-function Setup(context){
-  var controllerContext = Object.create(context)
+function Setup(parentContext){
+
+  var context = Object.create(parentContext)
+  var audioContext = context.audio
 
   var node = ObservStruct({
-    controllers: ObservNodeArray(controllerContext),
-    chunks: ObservNodeArray(context),
+    controllers: NodeArray(context),
+    chunks: NodeArray(context),
     selectedChunkId: Observ()
   })
 
-  node.selectedTriggerId = computed([node.selectedChunkId, node.chunks.controllerContextLookup], function(selectedChunkId, chunkLookup){
-    var selectedChunk = chunkLookup[selectedChunkId]
-    if (selectedChunk){
-      var selectedSlotId = selectedChunk.selectedSlotId
-      return selectedSlotId ? selectedChunkId + '#' + selectedSlotId : null
-    } else {
-      return null
-    }
-  })
+  // main output
+  node.output = audioContext.createGain()
+  context.output = node.output
+  node.output.connect(parentContext.output)
 
+  context.triggerEvent = function(event){
+    var split = event.id.split('/')
+    var chunk = context.chunkLookup.get(split[0])
+    var slotId = split[1]
+    if (chunk){
+      if (event.event === 'start'){
+        chunk.triggerOn(slotId, event.time)
+      } else if (event.event === 'stop'){
+        chunk.triggerOff(slotId, event.time)
+      }
+    }
+  }
+
+  // maps and lookup
+  node.controllers.resolved = map(node.controllers, 'resolved')
+  node.chunks.resolved = map(node.chunks, 'resolved')
+
+  context.chunkLookup = lookup(node.chunks, 'id')
+
+  node.context = context
 
 
   node.resolved = ObservStruct({
     controllers: node.controllers.resolved,
     chunks: node.chunks.resolved
-  })
-
-  controllerContext.chunkLookup = node.chunks.controllerContextLookup
-
-  var removeListener = null
-  var removeCloseListener = null
-  var currentTransaction = NO_TRANSACTION
-  var lastSavedValue = NO_TRANSACTION
-  var loading = false
-
-  var onLoad = null
-  var onClose = null
-  node.onLoad = Event(function(broadcast){
-    onLoad = broadcast
-  })
-  node.onClose = Event(function(broadcast){
-    onClose = broadcast
   })
 
   node.onRequestEditChunk = Event(function(broadcast){
@@ -77,58 +79,6 @@ function Setup(context){
     return id
   }
 
-  node.file = null
-
-  node(function(newValue){
-    if (newValue && newValue !== currentTransaction && node.file){
-      if (Object.keys(newValue).length > 0){
-        lastSavedValue = JSON.stringify(newValue)
-        node.file.set(lastSavedValue)
-      }
-    }
-  })
-
-  function release(){
-    if (removeListener){
-      removeListener()
-      removeCloseListener()
-      removeListener = null
-      removeCloseListener = null
-    }
-  }
-
-  node.load = function(src){
-    release()
-    if (src){
-      loading = true
-      node.file = context.project.getFile(src, onLoad)
-      node.path = node.file.path
-      removeListener = watch(node.file, update)
-      removeCloseListener = node.file.onClose(onClose)
-    }
-  }
-
-  node.rename = function(newFileName){
-    if (node.file){
-      var currentFileName = getBaseName(node.file.path)
-      if (newFileName !== currentFileName){
-        var directory = getDirName(node.file.path)
-        var newPath = join(directory, newFileName)
-        var src = context.project.relative(newPath)
-
-        release()
-
-        var file = context.project.getFile(src)
-        file.set(node.file())
-        node.file.delete()
-        node.file = file
-        node.path = node.file.path
-        removeListener = watch(node.file, update)
-        removeCloseListener = node.file.onClose(onClose)
-      }
-    }
-  }
-
   node.grabInput = function(){
     var length = node.controllers.getLength()
     for (var i=0;i<length;i++){
@@ -149,31 +99,6 @@ function Setup(context){
         }
       }
     }
-  }
-
-  node.destroy = function(){
-    if (node.file){
-      node.file.close()
-      node.file = null
-      node.set({})
-    }
-    release()
-  }
-
-  function update(data){
-    if (data && data !== lastSavedValue){
-      try {
-        var obj = JSON.parse(data || '{}') || {}
-        currentTransaction = obj || {}
-        node.set(currentTransaction)
-        currentTransaction = NO_TRANSACTION
-      } catch (ex) {
-        if (loading === true){
-          node.set(null)
-        }
-      }
-    }
-    loading = false
   }
 
   return node
