@@ -38,7 +38,16 @@
     "xtend": "^4.0.0"
   },
   "devDependencies": {
+    "adsr": "^0.1.1",
+    "audio-slot": "^2.0.0",
+    "bopper": "^2.4.1",
+    "lfo": "^2.0.0",
+    "loop-grid": "^3.3.1",
+    "loop-qwerty": "^1.2.0",
     "next-tick": "^0.2.2",
+    "soundbank-oscillator": "^1.1.0",
+    "soundbank-overdrive": "^1.0.0",
+    "soundbank-sample": "^1.0.1",
     "tape": "^3.0.0"
   }
 }
