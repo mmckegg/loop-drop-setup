@@ -1,6 +1,6 @@
 {
   "name": "loop-drop-setup",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Persist Loop Drop controller and chunk setups.",
   "main": "index.js",
   "scripts": {
