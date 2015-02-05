@@ -7,6 +7,8 @@ var ArrayGrid = require('array-grid')
 var computed = require('observ/computed')
 var lookup = require('observ-node-array/lookup')
 var nextTick = require('next-tick')
+var deepEqual = require('deep-equal')
+var ExternalRouter = require('./external-router')
 
 module.exports = Chunk
 
@@ -23,18 +25,18 @@ function Chunk(parentContext){
     slots: NodeArray(context),
     inputs: Observ([]),
     outputs: Observ([]),
-    routing: ObservVarhash({}),
+    routes: ExternalRouter(context),
     flags: ObservVarhash({}),
     volume: Observ(1),
     chokeAll: Observ(false),
-    color: Observ([255,255,255])
+    color: Observ([255,255,255]),
+    selectedSlotId: Observ()
   })
 
   obs.output = context.output
+  obs.context = context
 
   context.slotLookup = lookup(obs.slots, 'id')
-
-  var externalConnections = []
 
   obs.triggerOn = function(id, at){
     var slot = context.slotLookup.get(id)
@@ -76,64 +78,11 @@ function Chunk(parentContext){
     return ArrayGrid(triggers.map(getGlobalId), shape)
   })
 
-  obs.routing(function(){
-    nextTick(reconnect)
-  })
 
-  function reconnect(){
-
-    // disconnect all current connections
-    while (externalConnections.length){
-      externalConnections.pop().disconnect()
-    }
-
-    var routing = obs.routing() || {}
-
-    Object.keys(routing).forEach(function(from){
-
-      var target = routing[from]
-      var output = context.slotLookup.get(from)
-
-      if (typeof target === 'string'){
-        target = [target]
-      }
-
-      if (output && Array.isArray(target)){
-        var routed = false
-
-        target.forEach(function(to){
-
-          if (to && typeof to === 'string'){
-            if (to === '$default'){
-              output.connect(context.output)
-              routed = true
-            } else {
-              to = to.split('/')
-              var destinationChunk = context.chunkLookup.get(to[0])
-              var destinationSlot = destinationChunk && destinationChunk.getSlot(to[1])
-              if (destinationSlot && destinationSlot.input){
-                output.connect(destinationSlot.input)
-                routed = true
-              }
-            }
-
-          }
-        })
-
-        if (routed){
-          externalConnections.push(output)
-        }
-      }
-    })
-
-  }
+  obs.slots.onUpdate(obs.routes.reconnect)
 
   obs.destroy = function(){
-    while (externalConnections.length){
-      externalConnections.pop().disconnect()
-    }
-
-    // destroy all the child nodes
+    obs.routes.destroy()
   }
 
   return obs

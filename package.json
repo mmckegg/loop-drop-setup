@@ -29,6 +29,7 @@
   "dependencies": {
     "array-grid": "^1.4.0",
     "geval": "^2.1.1",
+    "deep-equal": "^0.2.1",
     "json-query": "^1.4.0",
     "next-tick": "^0.2.2",
     "observ": "^0.2.0",
