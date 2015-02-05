@@ -12,7 +12,7 @@ function QueryParam(target, query, forceParent){
 
 QueryParam.prototype.type = 'QueryParam'
 
-QueryParam.prototype.write = function(value){
+QueryParam.prototype.write = QueryParam.prototype.set =function(value){
   var newObject = obtain(this.target())
   var res = jsonQuery(this.query, {data: newObject})
   var obj = this.forceParent ? 
