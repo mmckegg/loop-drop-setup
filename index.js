@@ -1,6 +1,5 @@
 var ObservStruct = require('observ-struct')
 var NodeArray = require('observ-node-array')
-var Event = require('geval')
 var Observ = require('observ')
 var watch = require('observ/watch')
 var computed = require('observ/computed')
@@ -19,11 +18,14 @@ function Setup(parentContext){
   var context = Object.create(parentContext)
   var audioContext = context.audio
 
+
   var node = ObservStruct({
     controllers: NodeArray(context),
     chunks: NodeArray(context),
     selectedChunkId: Observ()
   })
+
+  context.setup = node
 
   // main output
   node.output = audioContext.createGain()
@@ -43,15 +45,37 @@ function Setup(parentContext){
     }
   }
 
-  // maps and lookup
-  node.controllers.resolved = map(node.controllers, 'resolved')
-  node.chunks.resolved = map(node.chunks, 'resolved')
+  node.resolveAvailableChunk = function(id){
+    var lookup = context.chunkLookup()
+    var incr = 0
 
-  context.chunkLookup = lookup(node.chunks, 'id')
+    while (lookup[id]){
+      incr += 1
+      id = base + ' ' + (incr + 1)
+    }
+
+    return id
+  }
+
+  node.destroy = function(){
+    node.chunks.destroy()
+    node.controllers.destroy()
+  }
+
+  // maps and lookup
+  node.controllers.resolved = map(node.controllers, resolve)
+  node.chunks.resolved = map(node.chunks, resolve)
+
+  context.chunkLookup = lookup(node.chunks, function(x){ 
+    var data = x.resolved ? x.resolved() : x()
+    return data && data.id || undefined
+  }, resolve, resolveInner)
+
 
   node.context = context
 
   node.resolved = ObservStruct({
+    selectedChunkId: node.selectedChunkId,
     controllers: node.controllers.resolved,
     chunks: node.chunks.resolved
   })
@@ -79,4 +103,12 @@ function Setup(parentContext){
   }
 
   return node
+}
+
+function resolve(node){
+  return node && node.resolved || node
+}
+
+function resolveInner(node){
+  return node && node.inner || node
 }
