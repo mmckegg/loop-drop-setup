@@ -19,7 +19,7 @@ function ScaleChunk(parentContext){
 
   var context = Object.create(parentContext)
 
-  context.output = context.audio.createGain()
+  var output = context.output = context.audio.createGain()
   context.output.connect(parentContext.output)
 
   var scaleSlots = NodeArray(context) 
@@ -35,6 +35,8 @@ function ScaleChunk(parentContext){
     slots: NodeArray(context),
     inputs: Observ([]),
     outputs: Observ([]),
+    volume: Observ(1),
+
     routes: ExternalRouter(context),
     flags: ObservVarhash({}),
     volume: Observ(1),
@@ -45,6 +47,10 @@ function ScaleChunk(parentContext){
 
   obs.output = context.output
   obs.context = context
+
+  obs.volume(function(value){
+    output.gain.value = value
+  })
 
   context.slotLookup = merge([
     lookup(scaleSlots, 'id'),

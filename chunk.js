@@ -16,7 +16,7 @@ function Chunk(parentContext){
 
   var context = Object.create(parentContext)
 
-  context.output = context.audio.createGain()
+  var output = context.output = context.audio.createGain()
   context.output.connect(parentContext.output)
 
   var obs = ObservStruct({
@@ -25,6 +25,7 @@ function Chunk(parentContext){
     slots: NodeArray(context),
     inputs: Observ([]),
     outputs: Observ([]),
+    volume: Observ(1),
     routes: ExternalRouter(context),
     flags: ObservVarhash({}),
     volume: Observ(1),
@@ -35,6 +36,10 @@ function Chunk(parentContext){
 
   obs.output = context.output
   obs.context = context
+
+  obs.volume(function(value){
+    output.gain.value = value
+  })
 
   context.slotLookup = lookup(obs.slots, 'id')
 
