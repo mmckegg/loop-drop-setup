@@ -13,7 +13,7 @@ function QueryParam(target, query, forceParent){
 QueryParam.prototype.type = 'QueryParam'
 
 QueryParam.prototype.write = QueryParam.prototype.set =function(value){
-  var newObject = obtain(this.target())
+  var newObject = obtain(read(this.target))
   var res = jsonQuery(this.query, {data: newObject})
   var obj = this.forceParent ? 
     forceParent(res, this.forceParent) : 
@@ -29,10 +29,18 @@ QueryParam.prototype.write = QueryParam.prototype.set =function(value){
 }
 
 QueryParam.prototype.read = function(){
-  var res = jsonQuery(this.query, {data: this.target()})
+  var res = jsonQuery(this.query, {data: read(this.target)})
   return res.value
 }
 
 function obtain(obj){
   return JSON.parse(JSON.stringify(obj))
+}
+
+function read(target){
+  if (typeof target === 'function'){
+    return target()
+  } else if (target && target.read){
+    return target.read()
+  }
 }
