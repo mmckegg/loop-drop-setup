@@ -2,6 +2,8 @@ var ObservStruct = require('observ-struct')
 var Observ = require('observ')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
+var SingleNode = require('observ-node-array/single')
+
 var ArrayGrid = require('array-grid')
 
 var computed = require('observ/computed')
@@ -29,7 +31,7 @@ function ScaleChunk(parentContext){
     shape: Observ(),
 
     offset: Observ(0),
-    templateSlot: Observ(),
+    templateSlot: SingleNode(context),
     scale: Observ(),
 
     slots: NodeArray(context),
