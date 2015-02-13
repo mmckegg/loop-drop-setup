@@ -64,7 +64,7 @@ function ScaleChunk(parentContext){
     var length = shape&&(shape[0]*shape[1])||1
     var result = []
     for (var i=0;i<length;i++){
-      var slot = obtainAndSubstitute(template, getNote(scale, i) + offset)
+      var slot = obtainAndSubstitute(template, getNote(scale, i) + (offset || 0))
       if (slot){
         slot.id = String(i)
         result.push(slot)
@@ -137,9 +137,35 @@ function obtainAndSubstitute(template, offset){
   return JSON.parse(JSON.stringify(template||{}, function(key, value){
     if (value && value.$offset){
       return value.value ? value.value + offset : offset
+    } else if (key && (key === 'transpose' || key === 'note')){
+      var val = getValue(value, 0) + offset
+      return getNewValue(value, val)
     }
+
     return value
   }))
+}
+
+function getNewValue(object, value){
+  if (object instanceof Object && !Array.isArray(object)){
+    var v = obtain(object)
+    v.value = getNewValue(v.value, value)
+    return v
+  } else {
+    return value
+  }
+}
+
+function getValue(object, defaultValue){
+  if (object instanceof Object && !Array.isArray(object)){
+    return getValue(object.value, defaultValue)
+  } else {
+    return object != null ? object : defaultValue
+  }
+}
+
+function obtain(obj){
+  return JSON.parse(JSON.stringify(obj))
 }
 
 function mod(n, m) {
