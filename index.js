@@ -119,5 +119,5 @@ function resolve(node){
 }
 
 function resolveInner(node){
-  return node && node.inner || node
+  return node && node.node || node
 }
