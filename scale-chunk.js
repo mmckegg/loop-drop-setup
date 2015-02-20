@@ -1,5 +1,6 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
+var ObservDefault = require('./observ-default.js')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
 var SingleNode = require('observ-node-array/single')
@@ -28,22 +29,21 @@ function ScaleChunk(parentContext){
 
   var obs = ObservStruct({
     id: Observ(),
-    shape: Observ(),
+    shape: ObservDefault([1,1]),
 
-    offset: Observ(0),
+    offset: ObservDefault(0),
     templateSlot: SingleNode(context),
     scale: Observ(),
 
     slots: NodeArray(context),
-    inputs: Observ([]),
-    outputs: Observ([]),
-    volume: Observ(1),
+    inputs: ObservDefault([]),
+    outputs: ObservDefault([]),
+    volume: ObservDefault(1),
 
     routes: ExternalRouter(context),
     flags: ObservVarhash({}),
-    volume: Observ(1),
-    chokeAll: Observ(false),
-    color: Observ([255,255,255]),
+    chokeAll: ObservDefault(false),
+    color: ObservDefault([255,255,255]),
     selectedSlotId: Observ()
   })
 
@@ -61,7 +61,7 @@ function ScaleChunk(parentContext){
   ])
 
   var computedSlots = computed([obs.offset, obs.templateSlot, obs.scale, obs.shape], function(offset, template, scale, shape){
-    var length = shape&&(shape[0]*shape[1])||1
+    var length = (shape[0]*shape[1])||0
     var result = []
     for (var i=0;i<length;i++){
       var slot = obtainAndSubstitute(template, getNote(scale, i) + (offset || 0))

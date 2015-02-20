@@ -1,5 +1,6 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
+var ObservDefault = require('./observ-default.js')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
 var ArrayGrid = require('array-grid')
@@ -21,16 +22,15 @@ function Chunk(parentContext){
 
   var obs = ObservStruct({
     id: Observ(),
-    shape: Observ(),
+    shape: ObservDefault([1,1]),
     slots: NodeArray(context),
-    inputs: Observ([]),
-    outputs: Observ([]),
-    volume: Observ(1),
+    inputs: ObservDefault([]),
+    outputs: ObservDefault([]),
     routes: ExternalRouter(context),
     flags: ObservVarhash({}),
-    volume: Observ(1),
-    chokeAll: Observ(false),
-    color: Observ([255,255,255]),
+    volume: ObservDefault(1),
+    chokeAll: ObservDefault(false),
+    color: ObservDefault([255,255,255]),
     selectedSlotId: Observ()
   })
 
@@ -69,7 +69,7 @@ function Chunk(parentContext){
   }
 
   obs.triggers = computed([obs.id, obs.shape], function(id, shape){
-    var length = Array.isArray(shape) && shape[0] * shape[1] || 0
+    var length = shape[0] * shape[1]
     var result = []
     for (var i=0;i<length;i++){
       result.push(String(i))
