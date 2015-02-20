@@ -66,6 +66,10 @@ function Setup(parentContext){
   // maps and lookup
   node.controllers.resolved = map(node.controllers, resolve)
   node.chunks.resolved = map(node.chunks, resolve)
+  node.chunks.lookup = lookup(node.chunks, function(x){
+    var descriptor = get(x)
+    return descriptor && descriptor.id || undefined
+  })
 
   context.chunkLookup = lookup(node.chunks, function(x){ 
     var data = x.resolved ? x.resolved() : x()
@@ -104,6 +108,10 @@ function Setup(parentContext){
   }
 
   return node
+}
+
+function get(obs){
+  return typeof obs == 'function' ? obs() : obs
 }
 
 function resolve(node){
