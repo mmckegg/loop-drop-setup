@@ -46,6 +46,7 @@ function Setup(parentContext){
   }
 
   node.resolveAvailableChunk = function(id){
+    var base = id
     var lookup = context.chunkLookup()
     var incr = 0
 
