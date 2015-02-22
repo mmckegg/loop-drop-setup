@@ -11,6 +11,8 @@ var relative = require('path').relative
 var map = require('observ-node-array/map')
 var lookup = require('observ-node-array/lookup')
 
+var ObservDefault = require('./observ-default.js')
+
 module.exports = Setup
 
 function Setup(parentContext){
@@ -22,10 +24,15 @@ function Setup(parentContext){
   var node = ObservStruct({
     controllers: NodeArray(context),
     chunks: NodeArray(context),
-    selectedChunkId: Observ()
+    selectedChunkId: Observ(),
+    globalScale: ObservDefault({
+      offset: 0, 
+      notes: [0,2,4,5,7,9,11]
+    })
   })
 
   context.setup = node
+  context.globalScale = node.globalScale
 
   // main output
   node.output = audioContext.createGain()

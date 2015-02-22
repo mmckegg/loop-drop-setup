@@ -27,13 +27,19 @@ function ScaleChunk(parentContext){
 
   var scaleSlots = NodeArray(context) 
 
+  var defaultScale = {
+    offset: 0, 
+    notes: [0,2,4,5,7,9,11]
+  }
+
   var obs = ObservStruct({
     id: Observ(),
     shape: ObservDefault([1,1]),
 
+    templateSlot: SingleNode(context), 
+
+    scale: ObservDefault(defaultScale),
     offset: ObservDefault(0),
-    templateSlot: SingleNode(context),
-    scale: Observ(),
 
     slots: NodeArray(context),
     inputs: ObservDefault([]),
@@ -45,6 +51,21 @@ function ScaleChunk(parentContext){
     chokeAll: ObservDefault(false),
     color: ObservDefault([255,255,255]),
     selectedSlotId: Observ()
+  })
+
+  var globalScale = ObservDefault(defaultScale)
+  if (context.globalScale){
+    var releaseGlobalScale = watch(context.globalScale, globalScale.set)
+  }
+
+  var scale = computed([obs.scale, globalScale], function(scale, globalScale){
+    if (scale === '$global'){
+      return globalScale
+    } else if (scale instanceof Object) {
+      return scale
+    } else {
+      return defaultScale
+    }
   })
 
   obs.output = context.output
@@ -60,15 +81,17 @@ function ScaleChunk(parentContext){
     singleLookup(obs.templateSlot, 'trigger')
   ])
 
-  var computedSlots = computed([obs.offset, obs.templateSlot, obs.scale, obs.shape], function(offset, template, scale, shape){
+  var computedSlots = computed([obs.templateSlot, scale, obs.shape, obs.offset], function(template, scale, shape, offset){
     var length = (shape[0]*shape[1])||0
     var result = []
     for (var i=0;i<length;i++){
-      var slot = obtain(template)
-      if (slot){
-        slot.id = String(i)
-        slot.noteOffset = getNote(scale, i) + (offset || 0)
-        result.push(slot)
+      if (template){
+        var slot = obtain(template)
+        if (slot){
+          slot.id = String(i)
+          slot.noteOffset = getNote(scale.notes, i + offset) + (scale.offset || 0)
+          result.push(slot)
+        }
       }
     }
     return result
@@ -121,6 +144,8 @@ function ScaleChunk(parentContext){
 
   obs.destroy = function(){
     obs.routes.destroy()
+    releaseGlobalScale&&releaseGlobalScale()
+    releaseGlobalScale = null
   }
 
   return obs
