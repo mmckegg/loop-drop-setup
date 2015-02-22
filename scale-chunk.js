@@ -103,7 +103,7 @@ function ScaleChunk(parentContext){
     var slot = context.slotLookup.get(id)
 
     if (obs.chokeAll()){
-      obs.slots.forEach(function(slot){
+      scaleSlots.forEach(function(slot){
         slot.choke(at)
       })
     }
