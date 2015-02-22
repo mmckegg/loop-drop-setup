@@ -20,7 +20,11 @@ QueryParam.prototype.write = QueryParam.prototype.set =function(value){
     jsonQuery.lastParent(res)
 
   if (obj){
-    obj[res.key] = value
+    if (value === undefined){
+      delete obj[res.key]
+    } else {
+      obj[res.key] = value
+    }
     this.target.set(newObject)
     return true
   } else {
