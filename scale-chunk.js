@@ -15,6 +15,8 @@ var nextTick = require('next-tick')
 var deepEqual = require('deep-equal')
 var ExternalRouter = require('./external-router')
 
+var Param = require('audio-slot/param')
+
 
 module.exports = ScaleChunk
 
@@ -38,8 +40,8 @@ function ScaleChunk(parentContext){
 
     templateSlot: SingleNode(context), 
 
-    offset: ObservDefault(0),
     scale: Property(defaultScale),
+    offset: Param(context, 0),
 
     slots: NodeArray(context),
     inputs: Property([]),
@@ -87,10 +89,13 @@ function ScaleChunk(parentContext){
     var result = []
     for (var i=0;i<length;i++){
       if (template){
-        var slot = obtain(template)
+        var slot = obtainWithParams(template, {
+          id: String(i),
+          value: i,
+          offset: offset,
+          scale: scale
+        })
         if (slot){
-          slot.id = String(i)
-          slot.noteOffset = getNote(scale.notes, i + offset) + (scale.offset || 0)
           result.push(slot)
         }
       }
@@ -176,6 +181,16 @@ function getValue(object, defaultValue){
   } else {
     return object != null ? object : defaultValue
   }
+}
+
+function obtainWithParams(obj, params){
+  return JSON.parse(JSON.stringify(obj, function(k,v){
+    if (v && v.$param){
+      return params[v.$param]
+    } else {
+      return v
+    }
+  }))
 }
 
 function obtain(obj){
