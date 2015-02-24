@@ -70,6 +70,7 @@ function ScaleChunk(parentContext){
 
   obs.output = context.output
   obs.context = context
+  context.chunk = obs
 
   obs.volume(function(value){
     output.gain.value = value
