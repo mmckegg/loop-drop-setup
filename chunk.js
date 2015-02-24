@@ -1,6 +1,6 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var ObservDefault = require('./observ-default.js')
+var Property = require('audio-slot/property')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
 var ArrayGrid = require('array-grid')
@@ -22,15 +22,15 @@ function Chunk(parentContext){
 
   var obs = ObservStruct({
     id: Observ(),
-    shape: ObservDefault([1,1]),
+    shape: Property([1,1]),
     slots: NodeArray(context),
-    inputs: ObservDefault([]),
-    outputs: ObservDefault([]),
+    inputs: Property([]),
+    outputs: Property([]),
     routes: ExternalRouter(context),
     flags: ObservVarhash({}),
-    volume: ObservDefault(1),
-    chokeAll: ObservDefault(false),
-    color: ObservDefault([255,255,255]),
+    volume: Property(1),
+    chokeAll: Property(false),
+    color: Property([255,255,255]),
     selectedSlotId: Observ()
   })
 
@@ -42,6 +42,7 @@ function Chunk(parentContext){
   })
 
   context.slotLookup = lookup(obs.slots, 'id')
+  context.chunk = obs
 
   obs.triggerOn = function(id, at){
     var slot = context.slotLookup.get(id)

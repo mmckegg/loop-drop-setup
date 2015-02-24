@@ -1,6 +1,6 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var ObservDefault = require('./observ-default.js')
+var Property = require('audio-slot/property')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
 var SingleNode = require('observ-node-array/single')
@@ -34,26 +34,26 @@ function ScaleChunk(parentContext){
 
   var obs = ObservStruct({
     id: Observ(),
-    shape: ObservDefault([1,1]),
+    shape: Property([1,1]),
 
     templateSlot: SingleNode(context), 
 
-    scale: ObservDefault(defaultScale),
     offset: ObservDefault(0),
+    scale: Property(defaultScale),
 
     slots: NodeArray(context),
-    inputs: ObservDefault([]),
-    outputs: ObservDefault([]),
-    volume: ObservDefault(1),
+    inputs: Property([]),
+    outputs: Property([]),
+    volume: Property(1),
 
     routes: ExternalRouter(context),
     flags: ObservVarhash({}),
-    chokeAll: ObservDefault(false),
-    color: ObservDefault([255,255,255]),
+    chokeAll: Property(false),
+    color: Property([255,255,255]),
     selectedSlotId: Observ()
   })
 
-  var globalScale = ObservDefault(defaultScale)
+  var globalScale = Property(defaultScale)
   if (context.globalScale){
     var releaseGlobalScale = watch(context.globalScale, globalScale.set)
   }

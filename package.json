@@ -28,6 +28,7 @@
   "homepage": "https://github.com/mmckegg/loop-drop-setup",
   "dependencies": {
     "array-grid": "^1.4.0",
+    "audio-slot": "^3.0.0",
     "deep-equal": "^0.2.1",
     "json-query": "^1.4.0",
     "next-tick": "^0.2.2",

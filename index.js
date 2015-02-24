@@ -11,7 +11,7 @@ var relative = require('path').relative
 var map = require('observ-node-array/map')
 var lookup = require('observ-node-array/lookup')
 
-var ObservDefault = require('./observ-default.js')
+var Property = require('audio-slot/property')
 
 module.exports = Setup
 
@@ -25,7 +25,7 @@ function Setup(parentContext){
     controllers: NodeArray(context),
     chunks: NodeArray(context),
     selectedChunkId: Observ(),
-    globalScale: ObservDefault({
+    globalScale: Property({
       offset: 0, 
       notes: [0,2,4,5,7,9,11]
     })
@@ -79,10 +79,17 @@ function Setup(parentContext){
   })
 
   context.chunkLookup = lookup(node.chunks, function(x){ 
-    var data = x.resolved ? x.resolved() : x()
-    return data && data.id || undefined
+    if (x){
+      var data = x.resolved ? x.resolved() : x()
+      return data && data.id || undefined 
+    }
   }, resolve, resolveInner)
 
+  context.paramLookup = lookup(node.chunks, function(x){
+    if (x && x.onSchedule){
+      return x.id()
+    }
+  }, resolve, resolveInner)
 
   node.context = context
 
