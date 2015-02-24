@@ -3,11 +3,12 @@ var forceParent = require('json-query/force-parent')
 
 module.exports = QueryParam
 
-function QueryParam(target, query, forceParent){
-  if (!(this instanceof QueryParam)) return new QueryParam(target, query, forceParent)
+function QueryParam(target, query, forceParent, context){
+  if (!(this instanceof QueryParam)) return new QueryParam(target, query, forceParent, context)
   this.target = target
   this.query = query
   this.forceParent = forceParent
+  this.context = context
 }
 
 QueryParam.prototype.type = 'QueryParam'
