@@ -25,6 +25,7 @@ function Setup(parentContext){
     controllers: NodeArray(context),
     chunks: NodeArray(context),
     selectedChunkId: Observ(),
+    volume: Property(1),
     globalScale: Property({
       offset: 0, 
       notes: [0,2,4,5,7,9,11]
@@ -38,6 +39,10 @@ function Setup(parentContext){
   node.output = audioContext.createGain()
   context.output = node.output
   node.output.connect(parentContext.output)
+
+  watch(node.volume, function(value){
+    node.output.gain.value = value
+  })
 
   context.triggerEvent = function(event){
     var split = event.id.split('/')
