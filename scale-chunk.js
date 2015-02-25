@@ -80,8 +80,7 @@ function ScaleChunk(parentContext){
 
   context.slotLookup = merge([
     lookup(scaleSlots, 'id'),
-    lookup(obs.slots, 'id'),
-    singleLookup(obs.templateSlot, 'trigger')
+    lookup(obs.slots, 'id')
   ])
 
   var computedSlots = computed([obs.templateSlot, scale, obs.shape, obs.offset], function(template, scale, shape, offset){
@@ -206,26 +205,4 @@ function getNote(scale, offset){
   var position = mod(offset, scale.length)
   var multiplier = Math.floor(offset/scale.length)
   return scale[position] + multiplier * 12
-}
-
-function singleLookup(item, key){
-  var obs = Observ([])
-
-  watch(item, function(data){
-    var res = {}
-    res[key] = data
-    obs.set(res)
-  })
-
-  obs.get = function(k){
-    if (k === key){
-      return item
-    }
-  }
-
-  obs.keys = function(){
-    return [key]
-  }
-
-  return obs
 }
