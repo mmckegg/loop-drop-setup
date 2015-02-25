@@ -30,7 +30,7 @@ function ModulatorChunk(parentContext){
     slots: NodeArray(context),
     minimised: Property(false),
     shape: Property([1,1]),
-    color: Property([255,255,255])
+    color: Property([0,0,0])
   })
 
   obs.context = context
