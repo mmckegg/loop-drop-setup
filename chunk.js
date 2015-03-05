@@ -27,7 +27,7 @@ function Chunk(parentContext){
     inputs: Property([]),
     outputs: Property([]),
     routes: ExternalRouter(context),
-    flags: ObservVarhash({}),
+    flags: Property([]),
     volume: Property(1),
     chokeAll: Property(false),
     color: Property([255,255,255]),

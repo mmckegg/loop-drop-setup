@@ -49,7 +49,7 @@ function ScaleChunk(parentContext){
     volume: Property(1),
 
     routes: ExternalRouter(context),
-    flags: ObservVarhash({}),
+    flags: Property([]),
     chokeAll: Property(false),
     color: Property([255,255,255]),
     selectedSlotId: Observ()
