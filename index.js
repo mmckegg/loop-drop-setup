@@ -126,6 +126,24 @@ function Setup(parentContext){
     }
   }
 
+  node.updateChunkReferences = function(oldId, newId){
+    node.controllers.forEach(function(controller){
+      if (controller.chunkPositions && controller.chunkPositions()){
+        var value = controller.chunkPositions()[oldId]
+        if (value && controller.chunkPositions.put){
+          controller.chunkPositions.delete(oldId)
+          controller.chunkPositions.put(newId, value)
+        }
+      }
+    })
+
+    updateParamReferences(node.chunks, oldId, newId)
+
+    if (node.selectedChunkId() === oldId){
+      node.selectedChunkId.set(newId)
+    }
+  }
+
   return node
 }
 
@@ -139,4 +157,19 @@ function resolve(node){
 
 function resolveInner(node){
   return node && node.node || node
+}
+
+function updateParamReferences(node, oldId, newId){
+  var changed = false
+  var result = JSON.stringify(node(), function(key, value){
+    if (value && value.node === 'modulator/param' && value.param === oldId){
+      value.param = newId
+      changed = true
+    }
+    return value
+  })
+
+  if (changed){
+    node.set(JSON.parse(result))
+  }
 }
