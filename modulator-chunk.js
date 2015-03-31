@@ -34,6 +34,8 @@ function ModulatorChunk(parentContext){
     flags: Property([])
   })
 
+  obs._type = 'ModulatorChunk'
+
   obs.context = context
   context.chunk = obs
 
