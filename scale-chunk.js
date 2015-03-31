@@ -17,7 +17,6 @@ var ExternalRouter = require('./external-router')
 
 var Param = require('audio-slot/param')
 
-
 module.exports = ScaleChunk
 
 function ScaleChunk(parentContext){
@@ -41,7 +40,7 @@ function ScaleChunk(parentContext){
     templateSlot: SingleNode(context), 
 
     scale: Property(defaultScale),
-    offset: Param(context, 0),
+    offset: Param(parentContext, 0),
 
     slots: NodeArray(context),
     inputs: Property([]),
@@ -55,6 +54,7 @@ function ScaleChunk(parentContext){
     selectedSlotId: Observ()
   })
 
+  context.offset = obs.offset
   var globalScale = Property(defaultScale)
   if (context.globalScale){
     var releaseGlobalScale = watch(context.globalScale, globalScale.set)
@@ -83,7 +83,7 @@ function ScaleChunk(parentContext){
     lookup(obs.slots, 'id')
   ])
 
-  var computedSlots = computed([obs.templateSlot, scale, obs.shape, obs.offset], function(template, scale, shape, offset){
+  var computedSlots = computed([obs.templateSlot, scale, obs.shape], function(template, scale, shape){
     var length = (shape[0]*shape[1])||0
     var result = []
     for (var i=0;i<length;i++){
@@ -91,7 +91,6 @@ function ScaleChunk(parentContext){
         var slot = obtainWithParams(template, {
           id: String(i),
           value: i,
-          offset: offset,
           scale: scale
         })
         if (slot){
