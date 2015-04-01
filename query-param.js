@@ -8,7 +8,7 @@ function QueryParam(target, query, forceParent, context){
   this.target = target
   this.query = query
   this.forceParent = forceParent
-  this.context = context
+  this.context = context || target.context
 }
 
 QueryParam.prototype.type = 'QueryParam'
