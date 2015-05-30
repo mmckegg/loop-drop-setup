@@ -69,11 +69,15 @@ function Chunk(parentContext){
     return context.slotLookup.get(id)
   }
 
-  obs.triggers = computed([obs.id, obs.shape], function(id, shape){
+  obs.triggers = computed([obs.id, obs.shape, context.slotLookup], function(id, shape){
     var length = shape[0] * shape[1]
     var result = []
     for (var i=0;i<length;i++){
-      result.push(String(i))
+      if (obs.getSlot(String(i))) {
+        result.push(String(i))
+      } else {
+        result.push(null)
+      }
     }
     return result
   })
