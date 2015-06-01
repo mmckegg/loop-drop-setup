@@ -3,6 +3,8 @@ var Observ = require('observ')
 var Property = require('audio-slot/property')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
+var NodeVarhash = require('observ-node-array/varhash')
+
 var ArrayGrid = require('array-grid')
 
 var computed = require('observ/computed')
@@ -10,6 +12,7 @@ var lookup = require('observ-node-array/lookup')
 var nextTick = require('next-tick')
 var deepEqual = require('deep-equal')
 var ExternalRouter = require('./external-router')
+var applyParams = require('./apply-params')
 
 module.exports = Chunk
 
@@ -26,6 +29,8 @@ function Chunk(parentContext){
     slots: NodeArray(context),
     inputs: Property([]),
     outputs: Property([]),
+    params: Property([]),
+    paramValues: NodeVarhash(parentContext),
     routes: ExternalRouter(context),
     flags: Property([]),
     volume: Property(1),
@@ -40,6 +45,8 @@ function Chunk(parentContext){
   obs.volume(function(value){
     output.gain.value = value
   })
+
+
 
   context.slotLookup = lookup(obs.slots, 'id')
   context.chunk = obs
@@ -94,6 +101,8 @@ function Chunk(parentContext){
   obs.destroy = function(){
     obs.routes.destroy()
   }
+
+  applyParams(obs)
 
   return obs
 

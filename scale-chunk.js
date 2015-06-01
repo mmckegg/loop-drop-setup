@@ -3,6 +3,7 @@ var Observ = require('observ')
 var Property = require('audio-slot/property')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
+var NodeVarhash = require('observ-node-array/varhash')
 var SingleNode = require('observ-node-array/single')
 
 var ArrayGrid = require('array-grid')
@@ -16,6 +17,7 @@ var deepEqual = require('deep-equal')
 var ExternalRouter = require('./external-router')
 
 var Param = require('audio-slot/param')
+var applyParams = require('./apply-params')
 
 module.exports = ScaleChunk
 
@@ -47,6 +49,9 @@ function ScaleChunk(parentContext){
     outputs: Property([]),
     volume: Property(1),
 
+    params: Property([]),
+    paramValues: NodeVarhash(parentContext),
+
     routes: ExternalRouter(context),
     flags: Property([]),
     chokeAll: Property(false),
@@ -55,6 +60,7 @@ function ScaleChunk(parentContext){
   })
 
   context.offset = obs.offset
+
   var globalScale = Property(defaultScale)
   if (context.globalScale){
     var releaseGlobalScale = watch(context.globalScale, globalScale.set)
@@ -143,14 +149,13 @@ function ScaleChunk(parentContext){
     return ArrayGrid(triggers.map(getGlobalId), shape)
   })
 
-  //obs.slots.onUpdate(obs.routes.reconnect)
-  //scaleSlots.onUpdate(obs.routes.reconnect)
-
   obs.destroy = function(){
     obs.routes.destroy()
     releaseGlobalScale&&releaseGlobalScale()
     releaseGlobalScale = null
   }
+
+  applyParams(obs)
 
   return obs
 
