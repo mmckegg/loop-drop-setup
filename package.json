@@ -30,6 +30,7 @@
     "array-grid": "^1.4.0",
     "audio-slot": "^3.0.0",
     "deep-equal": "^0.2.1",
+    "geval": "^2.1.1",
     "json-query": "^1.4.0",
     "next-tick": "^0.2.2",
     "observ": "^0.2.0",
@@ -37,18 +38,5 @@
     "observ-struct": "^5.0.1",
     "observ-varhash": "^1.0.4",
     "xtend": "^4.0.0"
-  },
-  "devDependencies": {
-    "adsr": "^0.1.1",
-    "audio-slot": "^2.0.0",
-    "bopper": "^2.4.1",
-    "lfo": "^2.0.0",
-    "loop-grid": "^3.3.1",
-    "loop-qwerty": "^1.2.0",
-    "next-tick": "^0.2.2",
-    "soundbank-oscillator": "^1.1.0",
-    "soundbank-overdrive": "^1.0.0",
-    "soundbank-sample": "^1.0.1",
-    "tape": "^3.0.0"
   }
 }
