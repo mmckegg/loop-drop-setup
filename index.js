@@ -32,6 +32,8 @@ function Setup(parentContext){
     })
   })
 
+  node._type = 'LoopDropSetup'
+
   context.setup = node
   context.globalScale = node.globalScale
 
