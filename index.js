@@ -12,6 +12,7 @@ var map = require('observ-node-array/map')
 var lookup = require('observ-node-array/lookup')
 
 var Property = require('audio-slot/property')
+var YankSilence = require('./yank-silence')
 
 module.exports = Setup
 
@@ -38,15 +39,17 @@ function Setup(parentContext){
   context.globalScale = node.globalScale
 
   // main output
-  node.output = audioContext.createGain()
-  context.output = node.output
+  context.output = audioContext.createGain()
+  node.output = YankSilence(audioContext, context.output)
   node.output.connect(parentContext.output)
+
 
   watch(node.volume, function(value){
     node.output.gain.value = value
   })
 
   context.triggerEvent = function(event){
+    node.output.trigger()
     var split = event.id.split('/')
     var chunk = context.chunkLookup.get(split[0])
     var slotId = split[1]
