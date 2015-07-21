@@ -172,7 +172,7 @@ function resolveInner(node){
 function updateParamReferences(node, oldId, newId){
   var changed = false
   var result = JSON.stringify(node(), function(key, value){
-    if (value && value.node === 'modulator/param' && value.param === oldId){
+    if (value && value.node === 'linkParam' && value.param === oldId){
       value.param = newId
       changed = true
     }
