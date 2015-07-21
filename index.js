@@ -3,6 +3,7 @@ var NodeArray = require('observ-node-array')
 var Observ = require('observ')
 var watch = require('observ/watch')
 var computed = require('observ/computed')
+var Event = require('geval')
 var getDirName = require('path').dirname
 var getBaseName = require('path').basename
 var join = require('path').join
@@ -48,7 +49,11 @@ function Setup(parentContext){
     node.output.gain.value = value
   })
 
-  context.triggerEvent = function(event){
+  node.onTrigger = Event(function (b) {
+    context.triggerEvent = b
+  })
+
+  node.onTrigger(function(event){
     node.output.trigger()
     var split = event.id.split('/')
     var chunk = context.chunkLookup.get(split[0])
@@ -60,7 +65,7 @@ function Setup(parentContext){
         chunk.triggerOff(slotId, event.time)
       }
     }
-  }
+  })
 
   node.resolveAvailableChunk = function(id){
     var base = id
