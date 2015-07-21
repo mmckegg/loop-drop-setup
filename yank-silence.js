@@ -15,7 +15,6 @@ module.exports = function(audioContext, input) {
   output.trigger = function() {
     if (!waiting) {
       yank.connect(output)
-      console.log('connect')
       waiting = true
       setTimeout(function() {
         var stopWaiting = setInterval(function() {
@@ -29,7 +28,6 @@ module.exports = function(audioContext, input) {
             clearTimeout(stopWaiting)
             yank.disconnect()
             waiting = false
-            console.log('disconnect')
           }
 
         }, 1000)
