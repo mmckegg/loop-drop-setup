@@ -44,6 +44,7 @@ function Setup(parentContext){
   node.output = YankSilence(audioContext, context.output)
   node.output.connect(parentContext.output)
 
+  context.active = context.output.active
 
   watch(node.volume, function(value){
     node.output.gain.value = value

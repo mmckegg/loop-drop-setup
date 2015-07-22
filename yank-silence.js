@@ -1,3 +1,5 @@
+var Observ = require('observ')
+
 module.exports = function(audioContext, input) {
 
   var output = audioContext.createGain()
@@ -12,10 +14,13 @@ module.exports = function(audioContext, input) {
   var fft = new Uint8Array(analyser.frequencyBinCount)
   var waiting = false
 
+  output.active = Observ(false)
+
   output.trigger = function() {
     if (!waiting) {
       yank.connect(output)
       waiting = true
+      output.active.set(true)
       setTimeout(function() {
         var stopWaiting = setInterval(function() {
           analyser.getByteFrequencyData(fft)
@@ -25,8 +30,9 @@ module.exports = function(audioContext, input) {
           }
 
           if (sum === 0) {
-            clearTimeout(stopWaiting)
+            clearInterval(stopWaiting)
             yank.disconnect()
+            output.active.set(false)
             waiting = false
           }
 
