@@ -11,6 +11,7 @@ var relative = require('path').relative
 
 var map = require('observ-node-array/map')
 var lookup = require('observ-node-array/lookup')
+var merge = require('observ-node-array/merge')
 
 var Property = require('audio-slot/property')
 var YankSilence = require('./yank-silence')
@@ -84,6 +85,7 @@ function Setup(parentContext){
   node.destroy = function(){
     node.chunks.destroy()
     node.controllers.destroy()
+    context.paramLookup.destroy()
   }
 
   // maps and lookup
@@ -101,12 +103,22 @@ function Setup(parentContext){
     }
   }, resolve, resolveInner)
 
-  context.paramLookup = lookup(node.chunks, function(x){
-    if (x && x.onSchedule){
-      return x.id()
-    }
-  }, resolve, resolveInner)
 
+  // extend param lookup
+  var lookups = []
+  if (context.paramLookup) {
+    lookups.push(context.paramLookup)
+  }
+
+  lookups.push(
+    lookup(node.chunks, function(x){
+      if (x && x.onSchedule){
+        return x.id()
+      }
+    }, resolve, resolveInner)
+  )
+
+  context.paramLookup = merge(lookups)
   node.context = context
 
   node.resolved = ObservStruct({
