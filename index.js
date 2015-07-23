@@ -23,7 +23,6 @@ function Setup(parentContext){
   var context = Object.create(parentContext)
   var audioContext = context.audio
 
-
   var node = ObservStruct({
     controllers: NodeArray(context),
     chunks: NodeArray(context),
@@ -45,7 +44,7 @@ function Setup(parentContext){
   node.output = YankSilence(audioContext, context.output)
   node.output.connect(parentContext.output)
 
-  context.active = context.output.active
+  context.active = node.output.active
 
   watch(node.volume, function(value){
     node.output.gain.value = value
