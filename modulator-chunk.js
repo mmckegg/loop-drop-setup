@@ -1,6 +1,6 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var Property = require('audio-slot/property')
+var Property = require('observ-default')
 var ObservVarhash = require('observ-varhash')
 var Event = require('geval')
 
@@ -17,7 +17,7 @@ var nextTick = require('next-tick')
 var deepEqual = require('deep-equal')
 var ExternalRouter = require('./external-router')
 
-var Transform = require('audio-slot/modulators/transform')
+var Transform = require('audio-slot-param/transform')
 
 module.exports = ModulatorChunk
 

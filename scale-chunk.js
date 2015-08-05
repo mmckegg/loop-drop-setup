@@ -1,6 +1,6 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var Property = require('audio-slot/property')
+var Property = require('observ-default')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
 var NodeVarhash = require('observ-node-array/varhash')
@@ -16,7 +16,7 @@ var nextTick = require('next-tick')
 var deepEqual = require('deep-equal')
 var ExternalRouter = require('./external-router')
 
-var Param = require('audio-slot/param')
+var Param = require('audio-slot-param')
 var applyParams = require('./apply-params')
 
 module.exports = ScaleChunk

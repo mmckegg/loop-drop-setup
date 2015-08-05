@@ -1,6 +1,6 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var Property = require('audio-slot/property')
+var Property = require('observ-default')
 var ObservVarhash = require('observ-varhash')
 var NodeArray = require('observ-node-array')
 var NodeVarhash = require('observ-node-array/varhash')

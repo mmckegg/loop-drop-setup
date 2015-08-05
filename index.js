@@ -13,7 +13,7 @@ var map = require('observ-node-array/map')
 var lookup = require('observ-node-array/lookup')
 var merge = require('observ-node-array/merge')
 
-var Property = require('audio-slot/property')
+var Property = require('observ-default')
 var YankSilence = require('./yank-silence')
 
 module.exports = Setup
