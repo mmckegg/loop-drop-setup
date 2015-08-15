@@ -68,7 +68,7 @@ function Setup(parentContext){
     }
   })
 
-  node.resolveAvailableChunk = function(id){
+  node.chunks.resolveAvailable = function(id){
     var base = id
     var lookup = context.chunkLookup()
     var incr = 0
@@ -80,6 +80,9 @@ function Setup(parentContext){
 
     return id
   }
+
+  // deprecated: use chunks.resolveAvailable
+  node.resolveAvailableChunk = node.chunks.resolveAvailable
 
   node.destroy = function(){
     node.chunks.destroy()
